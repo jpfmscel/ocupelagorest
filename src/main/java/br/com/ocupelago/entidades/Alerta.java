@@ -1,11 +1,19 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Alerta implements Serializable {
@@ -29,6 +37,17 @@ public class Alerta implements Serializable {
 	@Column(nullable = false)
 	private double longitude;
 
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataCriado;
+
+	@Column(nullable = false)
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	private boolean ativo = true;
+
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="alerta")
+	private List<Imagem> imagens;
+	
 	public String getDescricao() {
 		return descricao;
 	}
@@ -104,6 +123,22 @@ public class Alerta implements Serializable {
 
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public Date getDataCriado() {
+		return dataCriado;
+	}
+
+	public void setDataCriado(Date dataCriado) {
+		this.dataCriado = dataCriado;
 	}
 
 }

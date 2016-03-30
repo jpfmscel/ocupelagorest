@@ -1,13 +1,15 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.Type;
 
@@ -30,7 +32,6 @@ public class Esporte implements Serializable {
 	@Column(nullable = false, length = 3000)
 	private String recomendacoes;
 
-//	@Column(nullable = false, columnDefinition = "TINYINT", length = 1)
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean aereo;
@@ -42,10 +43,6 @@ public class Esporte implements Serializable {
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean terrestre;
-
-//	@Column(nullable = true, length = 10000, columnDefinition = "blob")
-	@Transient
-	private byte[] foto;
 
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
@@ -62,8 +59,12 @@ public class Esporte implements Serializable {
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
-	@Column(nullable = true, length = 1000)
-	private String filePath;
+	@Column(nullable = false)
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	private boolean ativo = true;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="esporte")
+	private List<Imagem> imagens;
 	
 	public int getId() {
 		return id;
@@ -113,14 +114,6 @@ public class Esporte implements Serializable {
 		this.terrestre = terrestre;
 	}
 
-	public byte[] getFoto() {
-		return foto;
-	}
-
-	public void setFoto(byte[] foto) {
-		this.foto = foto;
-	}
-
 	public String getVideoURL() {
 		return videoURL;
 	}
@@ -166,7 +159,6 @@ public class Esporte implements Serializable {
 		return "Esporte [id=" + id + ", nome=" + nome + ", descricao="
 				+ descricao + ", aereo=" + aereo + ", aquatico=" + aquatico
 				+ ", terrestre=" + terrestre + ", foto="
-				+ Arrays.toString(foto) + ", videoURL=" + videoURL
 				+ ", URL_facebook=" + URL_facebook + ", URL_youtube="
 				+ URL_youtube + ", URL_twitter=" + URL_twitter + ", URL_site="
 				+ URL_site + "]";
@@ -217,12 +209,23 @@ public class Esporte implements Serializable {
 		this.recomendacoes = recomendacoes;
 	}
 
-	public String getFilePath() {
-		return filePath;
+	public boolean isAtivo() {
+		return ativo;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public List<Imagem> getImagens() {
+		if (imagens == null) {
+			imagens = new ArrayList<>();
+		}
+		return imagens;
+	}
+
+	public void setImagens(List<Imagem> imagens) {
+		this.imagens = imagens;
 	}
 
 }

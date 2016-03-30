@@ -3,14 +3,18 @@ package br.com.ocupelago.entidades;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Noticia implements Serializable {
@@ -31,10 +35,6 @@ public class Noticia implements Serializable {
 	@Column(nullable = false, length = 3000)
 	private String descricao;
 
-	// @Column(nullable = true, length = 10000, columnDefinition = "blob")
-	@Transient
-	private byte[] foto;
-
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
 
@@ -50,13 +50,17 @@ public class Noticia implements Serializable {
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
-	@Column(nullable = true, length = 1000)
-	private String filePath;
-
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date criadoEm;
 
+	@Column(nullable = false)
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	private boolean ativo = true;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="noticia")
+	private List<Imagem> imagens;
+	
 	public int getId() {
 		return id;
 	}
@@ -87,14 +91,6 @@ public class Noticia implements Serializable {
 
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
-	}
-
-	public byte[] getFoto() {
-		return foto;
-	}
-
-	public void setFoto(byte[] foto) {
-		this.foto = foto;
 	}
 
 	public String getVideoURL() {
@@ -171,14 +167,6 @@ public class Noticia implements Serializable {
 				+ subtitulo + ", videoURL=" + videoURL + "]";
 	}
 
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-
 	public Date getCriadoEm() {
 		return criadoEm;
 	}
@@ -189,6 +177,14 @@ public class Noticia implements Serializable {
 
 	public String getDataCriadaFormatada() {
 		return new SimpleDateFormat("dd/MM/yyyy - HH:mm").format(getCriadoEm()) + " h de Brasília";
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 }

@@ -11,6 +11,8 @@
 		<class>br.com.ocupelago.entidades.Noticia</class>
 		<class>br.com.ocupelago.entidades.Projeto</class>
 		<class>br.com.ocupelago.entidades.Usuario</class>
+		<class>br.com.ocupelago.entidades.Avaliacao</class>
+		<class>br.com.ocupelago.entidades.Imagem</class>
 
 		<properties>
 			<!-- propriedades do hibernate -->

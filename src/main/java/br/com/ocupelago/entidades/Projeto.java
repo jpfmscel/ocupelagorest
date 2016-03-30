@@ -1,12 +1,16 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Projeto implements Serializable {
@@ -24,10 +28,6 @@ public class Projeto implements Serializable {
 	@Column(nullable = false, length = 3000)
 	private String descricao;
 
-//	@Column(nullable = true, length = 10000, columnDefinition = "blob")
-	@Transient
-	private byte[] foto;
-
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
 
@@ -43,8 +43,12 @@ public class Projeto implements Serializable {
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
-	@Column(nullable = true, length = 1000)
-	private String filePath;
+	@Column(nullable = false)
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	private boolean ativo = true;
+
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="projeto")
+	private List<Imagem> imagens;
 	
 	public int getId() {
 		return id;
@@ -70,13 +74,6 @@ public class Projeto implements Serializable {
 		this.descricao = descricao;
 	}
 
-	public byte[] getFoto() {
-		return foto;
-	}
-
-	public void setFoto(byte[] foto) {
-		this.foto = foto;
-	}
 
 	public String getVideoURL() {
 		return videoURL;
@@ -151,12 +148,12 @@ public class Projeto implements Serializable {
 		return true;
 	}
 
-	public String getFilePath() {
-		return filePath;
+	public boolean isAtivo() {
+		return ativo;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
 	}
 
 }

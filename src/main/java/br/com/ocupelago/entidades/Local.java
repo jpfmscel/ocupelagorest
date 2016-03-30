@@ -1,12 +1,16 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.Type;
 
 @Entity
 public class Local implements Serializable{
@@ -45,9 +49,6 @@ public class Local implements Serializable{
 	@Column(nullable = false)
 	private double longitude;
 
-	@Transient
-	private byte[] foto;
-
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
 
@@ -60,9 +61,16 @@ public class Local implements Serializable{
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
-	@Column(nullable = true, length = 1000)
-	private String filePath;
+	@Column(nullable = false)
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	private boolean ativo = true;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="local")
+	private List<Avaliacao> avaliacoes;
 
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="local")
+	private List<Imagem> imagens;
+	
 	public int getId() {
 		return id;
 	}
@@ -135,14 +143,6 @@ public class Local implements Serializable{
 		this.longitude = longitude;
 	}
 
-	public byte[] getFoto() {
-		return foto;
-	}
-
-	public void setFoto(byte[] foto) {
-		this.foto = foto;
-	}
-
 	public String getVideoURL() {
 		return videoURL;
 	}
@@ -175,20 +175,28 @@ public class Local implements Serializable{
 		URL_site = uRL_site;
 	}
 
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-
 	public String getCategoria() {
 		return categoria;
 	}
 
 	public void setCategoria(String categoria) {
 		this.categoria = categoria;
+	}
+
+	public boolean isAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo) {
+		this.ativo = ativo;
+	}
+
+	public List<Avaliacao> getAvaliacoes() {
+		return avaliacoes;
+	}
+
+	public void setAvaliacoes(List<Avaliacao> avaliacoes) {
+		this.avaliacoes = avaliacoes;
 	}
 
 }
