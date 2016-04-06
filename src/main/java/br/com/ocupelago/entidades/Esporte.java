@@ -10,8 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
+
+import br.com.ocupelago.entidades.rest.ImagemREST;
+
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class Esporte implements Serializable {
@@ -21,51 +26,78 @@ public class Esporte implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(nullable = false, insertable = false, updatable = false)
+	@Expose
 	private int id;
 
+	@Expose
 	@Column(nullable = false, length = 100)
 	private String nome;
 
+	@Expose
 	@Column(nullable = false, length = 3000)
 	private String descricao;
 
+	@Expose
 	@Column(nullable = false, length = 3000)
 	private String recomendacoes;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean aereo;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean aquatico;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean terrestre;
 
+	@Expose
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
 
+	@Expose
 	@Column(nullable = true, length = 1000)
 	private String URL_facebook;
 
+	@Expose
 	@Column(nullable = true, length = 1000)
 	private String URL_youtube;
 
+	@Expose
 	@Column(nullable = true, length = 1000)
 	private String URL_twitter;
 
+	@Expose
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean ativo = true;
-	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="esporte")
+
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Imagem> imagens;
-	
+
+	@Expose
+	@Transient
+	private List<ImagemREST> imagensREST;
+
+	public List<ImagemREST> getImagensREST() {
+		if (imagensREST == null) {
+			imagensREST = new ArrayList<ImagemREST>();
+			for (Imagem imagem : getImagens()) {
+				imagensREST.add(new ImagemREST(imagem));
+			}
+		}
+		return imagensREST;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -156,12 +188,8 @@ public class Esporte implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Esporte [id=" + id + ", nome=" + nome + ", descricao="
-				+ descricao + ", aereo=" + aereo + ", aquatico=" + aquatico
-				+ ", terrestre=" + terrestre + ", foto="
-				+ ", URL_facebook=" + URL_facebook + ", URL_youtube="
-				+ URL_youtube + ", URL_twitter=" + URL_twitter + ", URL_site="
-				+ URL_site + "]";
+		return "Esporte [id=" + id + ", nome=" + nome + ", descricao=" + descricao + ", aereo=" + aereo + ", aquatico=" + aquatico + ", terrestre=" + terrestre + ", foto=" + ", URL_facebook=" + URL_facebook + ", URL_youtube=" + URL_youtube
+				+ ", URL_twitter=" + URL_twitter + ", URL_site=" + URL_site + "]";
 	}
 
 	@Override

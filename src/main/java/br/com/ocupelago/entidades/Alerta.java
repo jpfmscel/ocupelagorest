@@ -1,6 +1,7 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,8 +13,13 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
+
+import br.com.ocupelago.entidades.rest.ImagemREST;
+
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class Alerta implements Serializable {
@@ -23,31 +29,52 @@ public class Alerta implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(nullable = false, insertable = false, updatable = false)
+	@Expose
 	private int id;
 
+	@Expose
 	@Column(nullable = false)
 	private String titulo;
 
+	@Expose
 	@Column(nullable = true)
 	private String descricao;
 
+	@Expose
 	@Column(nullable = false)
 	private double latitude;
 
+	@Expose
 	@Column(nullable = false)
 	private double longitude;
 
+	@Expose
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dataCriado;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean ativo = true;
 
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="alerta")
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Imagem> imagens;
-	
+
+	@Expose
+	@Transient
+	private List<ImagemREST> imagensREST;
+
+	public List<ImagemREST> getImagensREST() {
+		if (imagensREST == null) {
+			imagensREST = new ArrayList<ImagemREST>();
+			for (Imagem imagem : getImagens()) {
+				imagensREST.add(new ImagemREST(imagem));
+			}
+		}
+		return imagensREST;
+	}
+
 	public String getDescricao() {
 		return descricao;
 	}
@@ -66,8 +93,7 @@ public class Alerta implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Alerta [id=" + id + ", titulo=" + titulo + ", latitude="
-				+ getLatitude() + ", longitude=" + getLongitude() + "]";
+		return "Alerta [id=" + id + ", titulo=" + titulo + ", latitude=" + getLatitude() + ", longitude=" + getLongitude() + "]";
 	}
 
 	@Override
@@ -95,11 +121,9 @@ public class Alerta implements Serializable {
 		Alerta other = (Alerta) obj;
 		if (id != other.id)
 			return false;
-		if (Double.doubleToLongBits(getLatitude()) != Double
-				.doubleToLongBits(other.getLatitude()))
+		if (Double.doubleToLongBits(getLatitude()) != Double.doubleToLongBits(other.getLatitude()))
 			return false;
-		if (Double.doubleToLongBits(getLongitude()) != Double
-				.doubleToLongBits(other.getLongitude()))
+		if (Double.doubleToLongBits(getLongitude()) != Double.doubleToLongBits(other.getLongitude()))
 			return false;
 		if (titulo == null) {
 			if (other.titulo != null)
@@ -139,6 +163,14 @@ public class Alerta implements Serializable {
 
 	public void setDataCriado(Date dataCriado) {
 		this.dataCriado = dataCriado;
+	}
+
+	public List<Imagem> getImagens() {
+		return imagens;
+	}
+
+	public void setImagens(List<Imagem> imagens) {
+		this.imagens = imagens;
 	}
 
 }

@@ -14,7 +14,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.Where;
 
 @Entity
 public class Usuario implements Serializable {
@@ -25,10 +24,13 @@ public class Usuario implements Serializable {
 	@GeneratedValue
 	@Column(nullable = false, insertable = false, updatable = false)
 	private int id;
+
 	@Column(nullable = false)
 	private String nome;
+
 	@Column(nullable = false)
 	private String email;
+
 	@Column(nullable = false)
 	private String senha;
 

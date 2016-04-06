@@ -4,6 +4,7 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 import static spark.Spark.secure;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import br.com.ocupelago.dao.AlertaDAO;
 import br.com.ocupelago.dao.AvaliacaoDAO;
 import br.com.ocupelago.dao.BaseDao;
 import br.com.ocupelago.dao.EsporteDAO;
+import br.com.ocupelago.dao.EventoDAO;
 import br.com.ocupelago.dao.LocalDAO;
 import br.com.ocupelago.dao.NoticiaDAO;
 import br.com.ocupelago.dao.ProjetoDAO;
@@ -20,12 +22,15 @@ import br.com.ocupelago.dao.UsuarioDAO;
 import br.com.ocupelago.entidades.Alerta;
 import br.com.ocupelago.entidades.Avaliacao;
 import br.com.ocupelago.entidades.Esporte;
+import br.com.ocupelago.entidades.Evento;
 import br.com.ocupelago.entidades.Local;
 import br.com.ocupelago.entidades.Noticia;
 import br.com.ocupelago.entidades.Projeto;
 import br.com.ocupelago.entidades.Usuario;
+import br.com.ocupelago.util.UtilProperties;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class GenericService {
 
@@ -38,24 +43,38 @@ public class GenericService {
 	private static NoticiaDAO noticiaDao = new NoticiaDAO();
 	private static EsporteDAO esporteDao = new EsporteDAO();
 	private static AvaliacaoDAO avaliacaoDao = new AvaliacaoDAO();
+	private static EventoDAO eventoDao = new EventoDAO();
 
 	private static List<Alerta> listaAlerta;
 	private static List<Local> listaLocal;
 	private static List<Projeto> listaProjeto;
 	private static List<Noticia> listaNoticia;
 	private static List<Esporte> listaEsporte;
+	private static List<Avaliacao> listaAvaliacao;
+	private static List<Evento> listaEvento;
 
 	private static Date dataAlerta = new Date();
 	private static Date dataLocal = new Date();
 	private static Date dataProjeto = new Date();
 	private static Date dataNoticia = new Date();
 	private static Date dataEsporte = new Date();
+	private static Date dataAvaliacao = new Date();
+	private static Date dataEvento = new Date();
+
+	// (VPS) /usr/local/src/ocupelago/ocupelago.properties
+	// (JP) /Users/jpfms/ocupelago.properties
+	// (Amon)
+	// C:/Users/Amon/Dropbos/Dropbox/OcupeOLago/software/application/java/rest/KeyStore.jks
 
 	public static void main(String[] args) {
 
-		secure("/Users/jpfms/KeyStore.jks", "changeit", null, null);
-		// secure("C:/Users/Amon/Dropbos/Dropbox/OcupeOLago/software/application/java/rest/KeyStore.jks",
-		// "changeit", null, null);
+		 UtilProperties.setPATH(args[0]);
+//		UtilProperties.setPATH("/Users/jpfms/ocupelago.properties");
+		try {
+			secure(UtilProperties.getKSLocation(), UtilProperties.getKSPassword(), null, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		post("/login", "application/json", (request, response) -> {
 			Usuario us = loginUsuario(request);
@@ -109,6 +128,22 @@ public class GenericService {
 			return getProjetos();
 		});
 
+		post("/getavaliacoes", "application/json", (request, response) -> {
+			return getAvaliacoes();
+		});
+
+		get("/getavaliacoes", "application/json", (request, response) -> {
+			return getAvaliacoes();
+		});
+
+		post("/geteventos", "application/json", (request, response) -> {
+			return getEventos();
+		});
+
+		get("/geteventos", "application/json", (request, response) -> {
+			return getEventos();
+		});
+
 		post("/addalerta", "application/json", (request, response) -> {
 			return addAlerta(request);
 		});
@@ -124,7 +159,7 @@ public class GenericService {
 		get("/addavaliacao", "application/json", (request, response) -> {
 			return addAvaliacao(request);
 		});
-		
+
 	}
 
 	private static Object addAvaliacao(Request request) {
@@ -132,7 +167,7 @@ public class GenericService {
 		Avaliacao a = gson.fromJson(request.body(), Avaliacao.class);
 		a.setCriadoEm(new Date());
 		a.setAtivo(true);
-		
+
 		avaliacaoDao.iniciarTransacao();
 		avaliacaoDao.inserir(a);
 		avaliacaoDao.comitarTransacao();
@@ -151,7 +186,7 @@ public class GenericService {
 		Alerta a = gson.fromJson(request.body(), Alerta.class);
 		a.setDataCriado(new Date());
 		a.setAtivo(true);
-		
+
 		alertaDao.iniciarTransacao();
 		alertaDao.inserir(a);
 		alertaDao.comitarTransacao();
@@ -162,6 +197,11 @@ public class GenericService {
 		if (!(isSameMinute(dataProjeto) && !getListaProjeto().isEmpty())) {
 			atualizarLista(projetoDao, dataProjeto);
 		}
+		for (Projeto p : listaProjeto) {
+			p.getImagensREST();
+
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		return gson.toJson(getListaProjeto());
 	}
 
@@ -169,6 +209,10 @@ public class GenericService {
 		if (!(isSameMinute(dataAlerta) && !getListaAlerta().isEmpty())) {
 			atualizarLista(alertaDao, dataAlerta);
 		}
+		for (Alerta a : listaAlerta) {
+			a.getImagensREST();
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		return gson.toJson(getListaAlerta());
 	}
 
@@ -176,6 +220,10 @@ public class GenericService {
 		if (!(isSameMinute(dataLocal) && !getListaLocal().isEmpty())) {
 			atualizarLista(localDao, dataLocal);
 		}
+		for (Local l : listaLocal) {
+			l.getImagensREST();
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		return gson.toJson(getListaLocal());
 	}
 
@@ -183,6 +231,10 @@ public class GenericService {
 		if (!(isSameMinute(dataNoticia) && !getListaNoticia().isEmpty())) {
 			atualizarLista(noticiaDao, dataNoticia);
 		}
+		for (Noticia noticia : listaNoticia) {
+			noticia.getImagensREST();
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		return gson.toJson(getListaNoticia());
 	}
 
@@ -190,7 +242,30 @@ public class GenericService {
 		if (!(isSameMinute(dataEsporte) && !getListaEsporte().isEmpty())) {
 			atualizarLista(esporteDao, dataEsporte);
 		}
+		for (Esporte e : listaEsporte) {
+			e.getImagensREST();
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 		return gson.toJson(getListaEsporte());
+	}
+
+	private static Object getAvaliacoes() {
+		if (!(isSameMinute(dataAvaliacao) && !getListaAvaliacao().isEmpty())) {
+			atualizarLista(avaliacaoDao, dataAvaliacao);
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+		return gson.toJson(getListaAvaliacao());
+	}
+
+	private static Object getEventos() {
+		if (!(isSameMinute(dataEvento) && !getListaEvento().isEmpty())) {
+			atualizarLista(eventoDao, dataEvento);
+		}
+		for (Evento e : listaEvento) {
+			e.getImagensREST();
+		}
+		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+		return gson.toJson(getListaEvento());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -206,6 +281,10 @@ public class GenericService {
 			setListaProjeto((List<Projeto>) b.findAll());
 		} else if (b instanceof AlertaDAO) {
 			setListaAlerta((List<Alerta>) b.findAll());
+		} else if (b instanceof AvaliacaoDAO) {
+			setListaAvaliacao((List<Avaliacao>) b.findAll());
+		} else if (b instanceof EventoDAO) {
+			setListaEvento((List<Evento>) b.findAll());
 		}
 		d = new Date();
 	}
@@ -259,7 +338,6 @@ public class GenericService {
 		if (listaNoticia == null) {
 			listaNoticia = new ArrayList<>();
 		}
-
 		return listaNoticia;
 	}
 
@@ -277,6 +355,28 @@ public class GenericService {
 
 	public static void setListaEsporte(List<Esporte> listaEsporte) {
 		GenericService.listaEsporte = listaEsporte;
+	}
+
+	public static List<Avaliacao> getListaAvaliacao() {
+		if (listaAvaliacao == null) {
+			listaAvaliacao = new ArrayList<>();
+		}
+		return listaAvaliacao;
+	}
+
+	public static void setListaAvaliacao(List<Avaliacao> listaAvaliacao) {
+		GenericService.listaAvaliacao = listaAvaliacao;
+	}
+
+	public static List<Evento> getListaEvento() {
+		if (listaEvento == null) {
+			listaEvento = new ArrayList<>();
+		}
+		return listaEvento;
+	}
+
+	public static void setListaEvento(List<Evento> listaEvento) {
+		GenericService.listaEvento = listaEvento;
 	}
 
 }

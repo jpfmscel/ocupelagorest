@@ -1,6 +1,7 @@
 package br.com.ocupelago.entidades;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -9,8 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
+
+import br.com.ocupelago.entidades.rest.ImagemREST;
+
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class Projeto implements Serializable {
@@ -20,35 +26,58 @@ public class Projeto implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(nullable = false, insertable = false, updatable = false)
+	@Expose 
 	private int id;
 
+	@Expose 
 	@Column(nullable = false, length = 100)
 	private String titulo;
 
+	@Expose 
 	@Column(nullable = false, length = 3000)
 	private String descricao;
 
+	@Expose 
 	@Column(nullable = true, length = 1000)
 	private String videoURL;
-
+	
+	@Expose 
 	@Column(nullable = true, length = 1000)
 	private String URL_facebook;
 
+	@Expose 
 	@Column(nullable = true, length = 1000)
 	private String URL_youtube;
 
+	@Expose 
 	@Column(nullable = true, length = 1000)
 	private String URL_twitter;
 
+	@Expose 
 	@Column(nullable = true, length = 1000)
 	private String URL_site;
 
+	@Expose 
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean ativo = true;
 
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="projeto")
+	@OneToMany(cascade=CascadeType.ALL)
 	private List<Imagem> imagens;
+	
+	@Expose 
+	@Transient
+	private List<ImagemREST> imagensREST;
+	
+	public List<ImagemREST> getImagensREST() {
+		if (imagensREST == null) {
+			imagensREST = new ArrayList<ImagemREST>();
+			for (Imagem imagem : getImagens()) {
+				imagensREST.add(new ImagemREST(imagem));
+			}
+		}
+		return imagensREST;
+	}
 	
 	public int getId() {
 		return id;
@@ -154,6 +183,21 @@ public class Projeto implements Serializable {
 
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public void setImagensREST(List<ImagemREST> imagensREST) {
+		this.imagensREST = imagensREST;
+	}
+
+	public List<Imagem> getImagens() {
+		if (imagens == null) {
+			imagens = new ArrayList<>();
+		}
+		return imagens;
+	}
+
+	public void setImagens(List<Imagem> imagens) {
+		this.imagens = imagens;
 	}
 
 }

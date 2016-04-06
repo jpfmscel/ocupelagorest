@@ -14,7 +14,7 @@ public abstract class BaseDao<T> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@PersistenceContext
-	private EntityManager entityManager;
+	private static EntityManager entityManager;
 
 	public T buscarPorId(int id) {
 		return (T) getEntityManager().find(getClasse(), id);
@@ -40,7 +40,7 @@ public abstract class BaseDao<T> implements Serializable {
 		Query q = gerarQuery(o);
 		return (T) q.getSingleResult();
 	}
-	
+
 	public void iniciarTransacao() {
 		getEntityManager().getTransaction().begin();
 	}
@@ -69,11 +69,9 @@ public abstract class BaseDao<T> implements Serializable {
 
 						if (f.getName().equalsIgnoreCase("id")) {
 							if (((int) f.get(obj)) == 0) {
-								sb.append("and " + f.getName() + " > "
-										+ f.get(obj));
+								sb.append("and " + f.getName() + " > " + f.get(obj));
 							} else {
-								sb.append("and " + f.getName() + " = "
-										+ f.get(obj));
+								sb.append("and " + f.getName() + " = " + f.get(obj));
 							}
 						}
 					}
@@ -90,14 +88,13 @@ public abstract class BaseDao<T> implements Serializable {
 
 	public EntityManager getEntityManager() {
 		if (entityManager == null) {
-			entityManager = Persistence.createEntityManagerFactory("ocupelagoREST")
-					.createEntityManager();
+			entityManager = Persistence.createEntityManagerFactory("ocupelagoREST").createEntityManager();
 		}
 		return entityManager;
 	}
 
 	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
+		BaseDao.entityManager = entityManager;
 	}
 
 }

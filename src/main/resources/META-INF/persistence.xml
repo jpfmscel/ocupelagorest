@@ -13,6 +13,7 @@
 		<class>br.com.ocupelago.entidades.Usuario</class>
 		<class>br.com.ocupelago.entidades.Avaliacao</class>
 		<class>br.com.ocupelago.entidades.Imagem</class>
+		<class>br.com.ocupelago.entidades.Evento</class>
 
 		<properties>
 			<!-- propriedades do hibernate -->

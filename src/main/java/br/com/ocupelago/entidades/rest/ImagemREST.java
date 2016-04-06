@@ -1,34 +1,36 @@
-package br.com.ocupelago.entidades;
+package br.com.ocupelago.entidades.rest;
 
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import com.google.gson.annotations.Expose;
 
-@Entity
-public class Imagem implements Serializable {
+import br.com.ocupelago.entidades.Imagem;
 
-	private static final long serialVersionUID = 6755019750758876410L;
+public class ImagemREST implements Serializable {
 
-	@Id
-	@GeneratedValue
-	@Column(nullable = false, insertable = false, updatable = false)
+	private static final long serialVersionUID = 6273434707549777440L;
+
+	public ImagemREST(Imagem i) {
+		setId(i.getId());
+		setNomeArquivo(i.getNomeArquivo());
+		setConteudo(getBase64EncodedBytes(i));
+		setDataCriado(i.getDataCriado());
+	}
+
+	@Expose
 	private int id;
-
-	@Column(nullable = false)
+	@Expose
 	private String nomeArquivo;
-
-	@Column(nullable = false, length = 5000000)
-	private byte[] data;
-
-	@Column(nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
+	@Expose
+	private String conteudo;
+	@Expose
 	private Date dataCriado;
+
+	private String getBase64EncodedBytes(Imagem i) {
+		return new String(Base64.getEncoder().encode(i.getData()));
+	}
 
 	public int getId() {
 		return id;
@@ -44,14 +46,6 @@ public class Imagem implements Serializable {
 
 	public void setNomeArquivo(String nomeArquivo) {
 		this.nomeArquivo = nomeArquivo;
-	}
-
-	public byte[] getData() {
-		return data;
-	}
-
-	public void setData(byte[] data) {
-		this.data = data;
 	}
 
 	@Override
@@ -72,7 +66,7 @@ public class Imagem implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Imagem other = (Imagem) obj;
+		ImagemREST other = (ImagemREST) obj;
 		if (getDataCriado() == null) {
 			if (other.getDataCriado() != null)
 				return false;
@@ -94,6 +88,14 @@ public class Imagem implements Serializable {
 
 	public void setDataCriado(Date dataCriado) {
 		this.dataCriado = dataCriado;
+	}
+
+	public String getConteudo() {
+		return conteudo;
+	}
+
+	public void setConteudo(String conteudo) {
+		this.conteudo = conteudo;
 	}
 
 }

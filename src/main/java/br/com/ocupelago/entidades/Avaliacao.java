@@ -3,17 +3,16 @@ package br.com.ocupelago.entidades;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.Type;
+
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class Avaliacao implements Serializable {
@@ -23,28 +22,31 @@ public class Avaliacao implements Serializable {
 	@Id
 	@GeneratedValue
 	@Column(nullable = false, insertable = false, updatable = false)
+	@Expose
 	private int id;
 
+	@Expose
 	@Column(nullable = false, length = 100)
 	private String titulo;
 
+	@Expose
 	@Column(nullable = false, length = 1000)
 	private String comentario;
 
+	@Expose
 	@Column(nullable = false)
 	private Integer nota;
 
+	@Expose
 	@Column(nullable = false)
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	private boolean ativo = true;
 
+	@Expose
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date criadoEm;
 
-	@ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-	private Local local;
-	
 	public int getId() {
 		return id;
 	}
@@ -128,14 +130,6 @@ public class Avaliacao implements Serializable {
 		} else if (!nota.equals(other.nota))
 			return false;
 		return true;
-	}
-
-	public Local getLocal() {
-		return local;
-	}
-
-	public void setLocal(Local local) {
-		this.local = local;
 	}
 
 }
